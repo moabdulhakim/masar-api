@@ -11,6 +11,8 @@ export class PostgresErrorFilter implements ExceptionFilter {
     const errorMessage = (exception as any).detail;
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
 
+    console.log(exception)
+
     if(errorCode === "23505"){
         status = HttpStatus.CONFLICT;
     }else{

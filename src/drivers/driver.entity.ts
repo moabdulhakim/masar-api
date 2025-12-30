@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { VehicleType } from "./dto/vehicle-type.enum";
+import { Ride } from "src/rides/rides.entity";
 
 
 @Entity()
@@ -22,12 +23,18 @@ export class Driver {
     @Column()
     driverLicenseId: string;
 
-    @Column({default: "offline"})
+    @Column({default: "online"}) // online or offline
     status: string;
 
-    @Column({type: "json", nullable: true})
-    location: string;
+    @Column({type: "jsonb", nullable: true})
+    workingHours: {from: string, to: string};
+
+    @Column({type: "jsonb", nullable: true})
+    location: {lat: number, lng: number};
 
     @Column({default: true})
     isAvailable: boolean;
+
+    @OneToMany(()=> Ride, (ride)=> ride.driver)
+    rides: Ride[];
 }

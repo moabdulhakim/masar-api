@@ -1,9 +1,8 @@
 import { Module } from "@nestjs/common";
 import { DriversModule } from "./drivers/drivers.module";
-import { AuthModule } from "./auth/auth.module";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Driver } from './drivers/driver.entity';
 import { ConfigModule } from "@nestjs/config";
+import { RidesModule } from "./rides/rides.module";
 
 @Module({
     imports: [
@@ -18,7 +17,8 @@ import { ConfigModule } from "@nestjs/config";
             synchronize: true,
             ssl: true,
         }),
-        DriversModule
+        DriversModule,
+        RidesModule,
     ],
 })
 export class AppModule {}

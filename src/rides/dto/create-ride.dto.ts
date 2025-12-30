@@ -1,0 +1,34 @@
+import { IsEnum, IsNotEmpty, IsNumber, ValidateNested } from "class-validator";
+import { RideStatus } from "./ride-status.enum";
+import { Type } from "class-transformer";
+
+
+class LocationDto {
+    @IsNumber()
+    @IsNotEmpty()
+    lat: number;
+
+    @IsNumber()
+    @IsNotEmpty()
+    lng: number;
+}
+
+export class CreateRideDto {
+
+    @ValidateNested()
+    @Type(()=> LocationDto)
+    startLocation: LocationDto;
+
+    @ValidateNested()
+    @Type(()=> LocationDto)
+    endLocation: LocationDto;
+
+    @IsNumber()
+    @IsNotEmpty()
+    cost: number;
+
+    @IsEnum(RideStatus)
+    @IsNotEmpty()
+    status: RideStatus;
+}
+

@@ -1,9 +1,6 @@
 import { Body, Controller, Get, NotFoundException, Param, Post } from "@nestjs/common";
 import { DriversService } from "./drivers.service";
 import { CreateDriverDto } from "./dto/create-driver.dto";
-import { Repository } from "typeorm";
-import { Driver } from "./driver.entity";
-
 
 @Controller({
     path: "drivers",
