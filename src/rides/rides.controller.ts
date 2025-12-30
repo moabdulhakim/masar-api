@@ -1,4 +1,4 @@
-import { Body, Controller, Param, ParseUUIDPipe, Post } from "@nestjs/common";
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from "@nestjs/common";
 import { RidesService } from "./rides.service";
 import { CreateRideDto } from "./dto/create-ride.dto";
 
@@ -10,8 +10,18 @@ import { CreateRideDto } from "./dto/create-ride.dto";
 export class RidesController {
     constructor(private readonly ridesService: RidesService){}
 
-    @Post(":driverId")
-    create(@Param("driverId", ParseUUIDPipe) driverId: string, @Body() createRideDto: CreateRideDto){
-        return this.ridesService.create(driverId, createRideDto);
+    @Get()
+    findAll(){
+        return this.ridesService.findAll();
+    }
+    
+    @Post()
+    create(@Body() createRideDto: CreateRideDto){
+        return this.ridesService.create(createRideDto);
+    }
+
+    @Post(":rideId/accept/:driverId")
+    acceptRide(@Param("rideId", ParseUUIDPipe) rideId: string, @Param("driverId", ParseUUIDPipe) driverId: string){
+        return this.ridesService.acceptRide(rideId, driverId);
     }
 }

@@ -26,9 +26,5 @@ export class CreateRideDto {
     @IsNumber()
     @IsNotEmpty()
     cost: number;
-
-    @IsEnum(RideStatus)
-    @IsNotEmpty()
-    status: RideStatus;
 }
 

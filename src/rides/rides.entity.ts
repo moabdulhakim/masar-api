@@ -17,9 +17,9 @@ export class Ride {
     @Column("float")
     cost: number;
 
-    @Column({type: "enum", enum: RideStatus, default: RideStatus.PENDING})
+    @Column({type: "enum", enum: RideStatus, default: RideStatus.REQUESTED})
     status: RideStatus;
 
-    @ManyToOne(()=> Driver, (driver)=> driver.rides)
+    @ManyToOne(()=> Driver, (driver)=> driver.rides, {nullable: true})
     driver: Driver;
 }

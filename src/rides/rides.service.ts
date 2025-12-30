@@ -1,41 +1,80 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
-import { CreateRideDto } from "./dto/create-ride.dto";
-import { Ride } from "./rides.entity";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Driver } from "src/drivers/driver.entity";
-import { RideStatus } from "./dto/ride-status.enum";
-
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { CreateRideDto } from './dto/create-ride.dto';
+import { Ride } from './rides.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
+import { Driver } from 'src/drivers/driver.entity';
+import { RideStatus } from './dto/ride-status.enum';
 
 @Injectable()
 export class RidesService {
-    constructor(
-        @InjectRepository(Ride)
-        private readonly ridesRepository: Repository<Ride>,
+  constructor(
+    @InjectRepository(Ride)
+    private readonly ridesRepository: Repository<Ride>,
 
-        @InjectRepository(Driver)
-        private readonly driversRepository: Repository<Driver>,
-    ) {}
+    private readonly dataSource: DataSource,
+  ) {}
 
-    async create(driverId: string, createRideDto: CreateRideDto){
-        const driver = await this.driversRepository.findOneBy({id: driverId});
+  async findAll() {
+    return await this.ridesRepository.find();
+  }
 
-        if(!driver){
-            throw new NotFoundException(`Driver with id ${driverId} not found`);
-        }
+  async create(createRideDto: CreateRideDto) {
+    const newRide = this.ridesRepository.create({ ...createRideDto });
+    return await this.ridesRepository.save(newRide);
+  }
 
-        if(!driver.isAvailable){
-            throw new BadRequestException(`${driver.name} is busy right now, please try again later`);
-        }
+  async acceptRide(rideId: string, driverId: string) {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-        const newRide = this.ridesRepository.create({
-            ...createRideDto,
-            driver,
-        })
+    try {
+      const ride = await queryRunner.manager.findOne(Ride, {
+        where: { id: rideId },
+        lock: { mode: 'pessimistic_write' },
+      });
 
-        driver.isAvailable = false;
-        await this.driversRepository.save(driver);
+      if (!ride) {
+        throw new NotFoundException('Invalid Ride Id');
+      }
 
-        return await this.ridesRepository.save(newRide);
+      if (ride.status !== RideStatus.REQUESTED) {
+        throw new BadRequestException('This ride is already taken or cancelled');
+      }
+
+      const driver = await queryRunner.manager.findOne(Driver, {
+        where: { id: driverId },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!driver) {
+        throw new NotFoundException('Invalid Driver Id');
+      }
+
+      if (!driver.isAvailable) {
+        throw new BadRequestException(
+          'You are not available right now, try after this ride is completed',
+        );
+      }
+
+      ride.status = RideStatus.PENDING;
+      driver.isAvailable = false;
+
+      await queryRunner.manager.save(ride);
+      await queryRunner.manager.save(driver);
+
+      await queryRunner.commitTransaction();
+      return ride;
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
     }
+  }
 }
