@@ -85,26 +85,21 @@ export class RidesService {
       }
 
       const resultOfUpdateRide = await queryRunner.manager
-        .createQueryBuilder()
-        .update(Ride)
-        .set({ status: RideStatus.PENDING })
-        .where('id = :id', { id: rideId })
-        .andWhere('version = :currentVersion', { currentVersion: ride.version })
-        .execute();
+      .createQueryBuilder()
+      .update(Ride)
+      .set({status: RideStatus.PENDING, driver: driver})
+      .where("id = :id", { id: rideId })
+      .andWhere("version = :currentVersion", { currentVersion: ride.version })
+      .execute();
 
-      if (resultOfUpdateRide.affected == 0) {
-        throw new OptimisticLockVersionMismatchError(
-          'Ride',
-          ride.version,
-          ride.version + 1,
-        );
+      if (resultOfUpdateRide.affected === 0) {
+        throw new OptimisticLockVersionMismatchError('Ride', ride.version, ride.version + 1);
       }
 
-      // Update the ride status locally before returning
-      ride.status = RideStatus.PENDING;
+      const updatedRide = await queryRunner.manager.findOne(Ride, { where: { id: rideId } });
 
       await queryRunner.commitTransaction();
-      return ride;
+      return updatedRide;
     } catch (err) {
       await queryRunner.rollbackTransaction();
 
