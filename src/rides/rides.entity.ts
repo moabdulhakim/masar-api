@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, VersionColumn } from "typeorm";
 import { RideStatus } from "./dto/ride-status.enum";
 import { Driver } from "src/drivers/driver.entity";
 
@@ -22,4 +22,7 @@ export class Ride {
 
     @ManyToOne(()=> Driver, (driver)=> driver.rides, {nullable: true})
     driver: Driver;
+
+    @VersionColumn()
+    version: number;
 }
