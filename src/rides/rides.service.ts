@@ -66,24 +66,6 @@ export class RidesService {
         );
       }
 
-      const resultOfUpdateDriver = await queryRunner.manager
-        .createQueryBuilder()
-        .update(Driver)
-        .set({ isAvailable: false })
-        .where('id = :id', { id: driverId })
-        .andWhere('version = :currentVersion', {
-          currentVersion: driver.version,
-        })
-        .execute();
-
-      if (resultOfUpdateDriver.affected == 0) {
-        throw new OptimisticLockVersionMismatchError(
-          'Driver',
-          driver.version,
-          driver.version + 1,
-        );
-      }
-
       const resultOfUpdateRide = await queryRunner.manager
       .createQueryBuilder()
       .update(Ride)
