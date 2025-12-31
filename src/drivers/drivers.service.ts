@@ -1,26 +1,29 @@
-import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common";
-import { CreateDriverDto } from "./dto/create-driver.dto";
-import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
-import { Driver } from "./driver.entity";
-
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { CreateDriverDto } from './dto/create-driver.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Driver } from './driver.entity';
 
 @Injectable()
 export class DriversService {
-    constructor(
-        @InjectRepository(Driver)
-        private driversRepository: Repository<Driver>
-    ) {}
+  constructor(
+    @InjectRepository(Driver)
+    private driversRepository: Repository<Driver>,
+  ) {}
 
   async getAllDrivers() {
     return await this.driversRepository.find();
   }
 
-  async getById(id: string){
-    return await this.driversRepository.findOneBy({id});
+  async getById(id: string) {
+    return await this.driversRepository.findOneBy({ id });
   }
 
-  async create(createDriverDto: CreateDriverDto){
+  async create(createDriverDto: CreateDriverDto) {
     const newDriver = this.driversRepository.create(createDriverDto);
     return await this.driversRepository.save(newDriver);
   }
