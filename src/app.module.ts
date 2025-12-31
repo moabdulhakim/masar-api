@@ -15,7 +15,7 @@ import { RidesModule } from "./rides/rides.module";
             url: process.env.DATABASE_URL,
             autoLoadEntities: true,
             synchronize: true,
-            logging: false, // for debugging
+            logging: false, // set to true to enable query logging for debugging
             ssl: true,
         }),
         DriversModule,
