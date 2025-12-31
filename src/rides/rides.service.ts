@@ -71,8 +71,10 @@ export class RidesService {
         throw new OptimisticLockVersionMismatchError('Ride', ride.version, ride.version+1);
       }
 
+      const updatedRide = await queryRunner.manager.findOne(Ride, { where: { id: rideId } });
+
       await queryRunner.commitTransaction();
-      return ride;
+      return updatedRide;
     } catch (err) {
       await queryRunner.rollbackTransaction();
 
