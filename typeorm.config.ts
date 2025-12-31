@@ -9,5 +9,5 @@ export default new DataSource({
   url: process.env.DATABASE_URL,
   entities: [join(__dirname, 'dist', '**', '*.entity.js')],
   migrations: [join(__dirname, 'dist', 'src', 'db', 'migrations', '*.js')],
-  ssl: { rejectUnauthorized: false },
+  ssl: true,
 });
