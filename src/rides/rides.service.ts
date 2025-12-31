@@ -100,6 +100,9 @@ export class RidesService {
         );
       }
 
+      // Update the ride status locally before returning
+      ride.status = RideStatus.PENDING;
+
       await queryRunner.commitTransaction();
       return ride;
     } catch (err) {
@@ -110,7 +113,7 @@ export class RidesService {
           throw new BadRequestException('This driver is no longer available.');
         }
         throw new BadRequestException(
-          'Ups! Someone else took this ride just now.',
+          'Oops! Someone else took this ride just now.',
         );
       }
 
