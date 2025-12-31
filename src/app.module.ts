@@ -14,7 +14,7 @@ import { RidesModule } from './rides/rides.module';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
-      synchronize: true,
+      synchronize: false,
       logging: false, // set to true to enable query logging for debugging
       ssl: true,
     }),

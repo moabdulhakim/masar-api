@@ -42,7 +42,4 @@ export class Driver {
 
   @OneToMany(() => Ride, (ride) => ride.driver)
   rides: Ride[];
-
-  @VersionColumn()
-  version: number;
 }
