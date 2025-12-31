@@ -79,7 +79,7 @@ export class RidesService {
       await queryRunner.rollbackTransaction();
 
       if(err instanceof OptimisticLockVersionMismatchError) {
-        throw new BadRequestException('Ups! Someone else took this ride just now.');
+        throw new BadRequestException('Oops! Someone else took this ride just now.');
       }
 
       throw err;
