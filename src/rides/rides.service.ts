@@ -62,7 +62,7 @@ export class RidesService {
       const resultOfUpdateRide = await queryRunner.manager
       .createQueryBuilder()
       .update(Ride)
-      .set({status: RideStatus.PENDING})
+      .set({status: RideStatus.PENDING, driver: driver})
       .where("id = :id", { id: rideId })
       .andWhere("version = :currentVersion", { currentVersion: ride.version })
       .execute();
