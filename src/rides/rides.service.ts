@@ -67,8 +67,8 @@ export class RidesService {
       .andWhere("version = :currentVersion", { currentVersion: ride.version })
       .execute();
 
-      if(resultOfUpdateRide.affected == 0){
-        throw new OptimisticLockVersionMismatchError('Ride', ride.version, ride.version+1);
+      if (resultOfUpdateRide.affected === 0) {
+        throw new OptimisticLockVersionMismatchError('Ride', ride.version, ride.version + 1);
       }
 
       const updatedRide = await queryRunner.manager.findOne(Ride, { where: { id: rideId } });
