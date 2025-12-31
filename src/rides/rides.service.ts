@@ -6,7 +6,11 @@ import {
 import { CreateRideDto } from './dto/create-ride.dto';
 import { Ride } from './rides.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, OptimisticLockVersionMismatchError, Repository } from 'typeorm';
+import {
+  DataSource,
+  OptimisticLockVersionMismatchError,
+  Repository,
+} from 'typeorm';
 import { Driver } from 'src/drivers/driver.entity';
 import { RideStatus } from './dto/ride-status.enum';
 
@@ -34,17 +38,23 @@ export class RidesService {
     await queryRunner.startTransaction();
 
     try {
-      const ride = await queryRunner.manager.findOne(Ride, {where: { id: rideId }});
+      const ride = await queryRunner.manager.findOne(Ride, {
+        where: { id: rideId },
+      });
 
       if (!ride) {
         throw new NotFoundException('Invalid Ride Id');
       }
 
       if (ride.status !== RideStatus.REQUESTED) {
-        throw new BadRequestException('This ride is already taken or cancelled');
+        throw new BadRequestException(
+          'This ride is already taken or cancelled',
+        );
       }
 
-      const driver = await queryRunner.manager.findOne(Driver, {where: { id: driverId }});
+      const driver = await queryRunner.manager.findOne(Driver, {
+        where: { id: driverId },
+      });
 
       if (!driver) {
         throw new NotFoundException('Invalid Driver Id');
@@ -56,19 +66,38 @@ export class RidesService {
         );
       }
 
-      driver.isAvailable = false;
-      await queryRunner.manager.save(driver);
+      const resultOfUpdateDriver = await queryRunner.manager
+        .createQueryBuilder()
+        .update(Driver)
+        .set({ isAvailable: false })
+        .where('id = :id', { id: driverId })
+        .andWhere('version = :currentVersion', {
+          currentVersion: driver.version,
+        })
+        .execute();
+
+      if (resultOfUpdateDriver.affected == 0) {
+        throw new OptimisticLockVersionMismatchError(
+          'Driver',
+          driver.version,
+          driver.version + 1,
+        );
+      }
 
       const resultOfUpdateRide = await queryRunner.manager
-      .createQueryBuilder()
-      .update(Ride)
-      .set({status: RideStatus.PENDING})
-      .where("id = :id", { id: rideId })
-      .andWhere("version = :currentVersion", { currentVersion: ride.version })
-      .execute();
+        .createQueryBuilder()
+        .update(Ride)
+        .set({ status: RideStatus.PENDING })
+        .where('id = :id', { id: rideId })
+        .andWhere('version = :currentVersion', { currentVersion: ride.version })
+        .execute();
 
-      if(resultOfUpdateRide.affected == 0){
-        throw new OptimisticLockVersionMismatchError('Ride', ride.version, ride.version+1);
+      if (resultOfUpdateRide.affected == 0) {
+        throw new OptimisticLockVersionMismatchError(
+          'Ride',
+          ride.version,
+          ride.version + 1,
+        );
       }
 
       await queryRunner.commitTransaction();
@@ -76,8 +105,13 @@ export class RidesService {
     } catch (err) {
       await queryRunner.rollbackTransaction();
 
-      if(err instanceof OptimisticLockVersionMismatchError) {
-        throw new BadRequestException('Ups! Someone else took this ride just now.');
+      if (err instanceof OptimisticLockVersionMismatchError) {
+        if (err.message.includes('Driver')) {
+          throw new BadRequestException('This driver is no longer available.');
+        }
+        throw new BadRequestException(
+          'Ups! Someone else took this ride just now.',
+        );
       }
 
       throw err;

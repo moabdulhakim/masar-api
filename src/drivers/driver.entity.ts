@@ -1,40 +1,48 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
-import { VehicleType } from "./dto/vehicle-type.enum";
-import { Ride } from "src/rides/rides.entity";
-
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  VersionColumn,
+} from 'typeorm';
+import { VehicleType } from './dto/vehicle-type.enum';
+import { Ride } from 'src/rides/rides.entity';
 
 @Entity()
 export class Driver {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column({unique: true})
-    phone: string;
+  @Column({ unique: true })
+  phone: string;
 
-    @Column("float", {default: 5.0})
-    rating: number;
+  @Column('float', { default: 5.0 })
+  rating: number;
 
-    @Column({enum: VehicleType, type: "enum", default: VehicleType.CAR})
-    vehicleType: VehicleType;
+  @Column({ enum: VehicleType, type: 'enum', default: VehicleType.CAR })
+  vehicleType: VehicleType;
 
-    @Column()
-    driverLicenseId: string;
+  @Column()
+  driverLicenseId: string;
 
-    @Column({default: "online"}) // online or offline
-    status: string;
+  @Column({ default: 'online' }) // online or offline
+  status: string;
 
-    @Column({type: "jsonb", nullable: true})
-    workingHours: {from: string, to: string};
+  @Column({ type: 'jsonb', nullable: true })
+  workingHours: { from: string; to: string };
 
-    @Column({type: "jsonb", nullable: true})
-    location: {lat: number, lng: number};
+  @Column({ type: 'jsonb', nullable: true })
+  location: { lat: number; lng: number };
 
-    @Column({default: true})
-    isAvailable: boolean;
+  @Column({ default: true })
+  isAvailable: boolean;
 
-    @OneToMany(()=> Ride, (ride)=> ride.driver)
-    rides: Ride[];
+  @OneToMany(() => Ride, (ride) => ride.driver)
+  rides: Ride[];
+
+  @VersionColumn()
+  version: number;
 }
