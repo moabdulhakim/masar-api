@@ -34,6 +34,8 @@ Create a `.env` file in the root directory. You will need a PostgreSQL connectio
 ```env
 # .env
 DATABASE_URL="postgres://user:password@host/database?sslmode=require"
+JWT_SECRET=73d895c51601bceebf80f6432e953d9f6a49f070423da2dcd9e04cb1cb762354
+JWT_EXPIRATION_TIME="1d"
 ```
 
 ### 4. Run the application

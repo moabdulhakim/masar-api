@@ -15,7 +15,7 @@ import dbConfigProduction from './config/db.config.production';
       envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: process.env.NODE_ENV === 'development' ? dbConfigDevelopment : dbConfigProduction,
+      useFactory: process.env.NODE_ENV === 'production' ? dbConfigProduction : dbConfigDevelopment,
     }),
     DriversModule,
     RidesModule,

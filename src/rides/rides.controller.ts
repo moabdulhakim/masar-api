@@ -11,6 +11,7 @@ import { RidesService } from './rides.service';
 import { CreateRideDto } from './dto/create-ride.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { AuthJWTPayload } from 'src/auth/types/auth-jwtPayload';
 
 @Controller({
   path: 'rides',
@@ -33,9 +34,9 @@ export class RidesController {
   @Post(':rideId/accept')
   acceptRide(
     @Param('rideId', ParseUUIDPipe) rideId: string,
-    @CurrentUser() user: { id: string, email: string }
+    @CurrentUser() user: AuthJWTPayload
   ) {
-    const driverId = user.id;
+    const driverId = user.sub;
     return this.ridesService.acceptRide(rideId, driverId);
   }
 }

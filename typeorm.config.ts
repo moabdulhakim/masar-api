@@ -6,5 +6,5 @@ import { config } from 'dotenv';
 config();
 
 export default new DataSource(
-  process.env.NODE_ENV === 'development' ? dbConfigDevelopment() : dbConfigProduction()
+  process.env.NODE_ENV === 'production' ? dbConfigProduction() : dbConfigDevelopment()
 );

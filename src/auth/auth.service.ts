@@ -17,13 +17,12 @@ export class AuthService {
   async login(loginData: LoginDto) {
     const user = await this.driverRepository.findOneBy({email: loginData.email});
 
-    if(!user){
-        throw new BadRequestException("Email or Password is invalid");
-    }
-
-    // Password Validation
-    if(loginData.password !== user.password){
-        throw new BadRequestException("Email or Password is invalid");
+    // Always perform a password comparison to reduce timing differences
+    const storedPassword = user ? user.password : 'dummy_password_value';
+    const passwordMatches = loginData.password === storedPassword;
+    // Reject if user does not exist or password is invalid
+    if (!user || !passwordMatches) {
+      throw new BadRequestException("Email or Password is invalid");
     }
 
     const payload: AuthJWTPayload = {

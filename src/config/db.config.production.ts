@@ -4,7 +4,7 @@ import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConne
 export default (): PostgresConnectionOptions => (
     {
       type: 'postgres',
-      url: process.env.DATABASE_URL_PRODUCTION,
+      url: process.env.DATABASE_URL,
       entities: [join(__dirname, '..', '..', '**', '*.entity.js')],
       migrations: [join(__dirname, '..', '..','dist', 'src', 'db', 'migrations', '*.js')],
       synchronize: false,
