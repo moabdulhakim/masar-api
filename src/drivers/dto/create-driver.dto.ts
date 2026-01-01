@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { VehicleType } from './vehicle-type.enum';
 
 export class CreateDriverDto {
@@ -13,6 +13,15 @@ export class CreateDriverDto {
   @IsString({ message: 'Phone must be a string' })
   @IsNotEmpty()
   phone: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(8)
+  password: string;
 
   @IsString({ message: 'Driver License ID must be a string' })
   @IsNotEmpty()

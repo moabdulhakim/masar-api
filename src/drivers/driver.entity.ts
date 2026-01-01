@@ -3,7 +3,6 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
-  VersionColumn,
 } from 'typeorm';
 import { VehicleType } from './dto/vehicle-type.enum';
 import { Ride } from 'src/rides/rides.entity';
@@ -18,6 +17,12 @@ export class Driver {
 
   @Column({ unique: true })
   phone: string;
+
+  @Column({unique: true})
+  email: string;
+
+  @Column()
+  password: string;
 
   @Column('float', { default: 5.0 })
   rating: number;

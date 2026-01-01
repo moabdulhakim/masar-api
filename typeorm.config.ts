@@ -1,13 +1,10 @@
 import { DataSource } from 'typeorm';
+import dbConfigDevelopment from './src/config/db.config.development';
+import dbConfigProduction from './src/config/db.config.production';
 import { config } from 'dotenv';
-import { join } from 'path';
 
 config();
 
-export default new DataSource({
-  type: 'postgres',
-  url: process.env.DATABASE_URL,
-  entities: [join(__dirname, 'dist', '**', '*.entity.js')],
-  migrations: [join(__dirname, 'dist', 'src', 'db', 'migrations', '*.js')],
-  ssl: true,
-});
+export default new DataSource(
+  process.env.NODE_ENV === 'development' ? dbConfigDevelopment() : dbConfigProduction()
+);

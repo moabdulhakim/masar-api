@@ -1,5 +1,4 @@
-import { IsEnum, IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
-import { RideStatus } from './ride-status.enum';
+import { IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class LocationDto {

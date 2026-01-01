@@ -5,9 +5,12 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { RidesService } from './rides.service';
 import { CreateRideDto } from './dto/create-ride.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Controller({
   path: 'rides',
@@ -26,11 +29,13 @@ export class RidesController {
     return this.ridesService.create(createRideDto);
   }
 
-  @Post(':rideId/accept/:driverId')
+  @UseGuards(JwtAuthGuard)
+  @Post(':rideId/accept')
   acceptRide(
     @Param('rideId', ParseUUIDPipe) rideId: string,
-    @Param('driverId', ParseUUIDPipe) driverId: string,
+    @CurrentUser() user: { id: string, email: string }
   ) {
+    const driverId = user.id;
     return this.ridesService.acceptRide(rideId, driverId);
   }
 }
