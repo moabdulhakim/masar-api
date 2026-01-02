@@ -1,28 +1,19 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { VehicleType } from './dto/vehicle-type.enum';
 import { Ride } from 'src/rides/rides.entity';
+import { User } from 'src/users/user.entity';
 
 @Entity()
 export class Driver {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column()
-  name: string;
-
-  @Column({ unique: true })
-  phone: string;
-
-  @Column({unique: true})
-  email: string;
-
-  @Column()
-  password: string;
 
   @Column('float', { default: 5.0 })
   rating: number;
@@ -30,21 +21,19 @@ export class Driver {
   @Column({ enum: VehicleType, type: 'enum', default: VehicleType.CAR })
   vehicleType: VehicleType;
 
-  @Column()
+  @Column({length: 100})
   driverLicenseId: string;
-
-  @Column({ default: 'online' }) // online or offline
-  status: string;
 
   @Column({ type: 'jsonb', nullable: true })
   workingHours: { from: string; to: string };
-
-  @Column({ type: 'jsonb', nullable: true })
-  location: { lat: number; lng: number };
 
   @Column({ default: true })
   isAvailable: boolean;
 
   @OneToMany(() => Ride, (ride) => ride.driver)
   rides: Ride[];
+
+  @OneToOne(() => User, (user) => user.driverProfile, {onDelete: 'CASCADE'})
+  @JoinColumn()
+  user: User;
 }

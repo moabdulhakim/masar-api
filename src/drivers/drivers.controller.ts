@@ -16,22 +16,6 @@ import { CreateDriverDto } from './dto/create-driver.dto';
 export class DriversController {
   constructor(private readonly driversService: DriversService) {}
 
-  @Get()
-  getAll() {
-    return this.driversService.getAllDrivers();
-  }
-
-  @Get(':id')
-  getById(@Param('id') id: string) {
-    const driver = this.driversService.getById(id);
-
-    if (!driver) {
-      throw new NotFoundException(`Driver with id ${id} not found`);
-    }
-
-    return driver;
-  }
-
   @Post()
   create(@Body() createDriverDto: CreateDriverDto) {
     return this.driversService.create(createDriverDto);

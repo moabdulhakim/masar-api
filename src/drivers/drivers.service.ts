@@ -15,14 +15,6 @@ export class DriversService {
     private driversRepository: Repository<Driver>,
   ) {}
 
-  async getAllDrivers() {
-    return await this.driversRepository.find();
-  }
-
-  async getById(id: string) {
-    return await this.driversRepository.findOneBy({ id });
-  }
-
   async create(createDriverDto: CreateDriverDto) {
     const newDriver = this.driversRepository.create(createDriverDto);
     return await this.driversRepository.save(newDriver);

@@ -1,37 +1,70 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthJWTPayload } from 'src/auth/types/auth-jwtPayload';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Driver } from 'src/drivers/driver.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/users/user.entity';
+import { RegisterUserDto } from 'src/users/dto/register-user.dto';
+import * as argon2 from 'argon2';
+
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    @InjectRepository(Driver)
-    private readonly driverRepository: Repository<Driver>
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {}
 
   async login(loginData: LoginDto) {
-    const user = await this.driverRepository.findOneBy({email: loginData.email});
+    const user = await this.userRepository.findOne({
+      where: {email: loginData.email},
+      select: ['id', 'email', 'password']
+    });
 
-    // Always perform a password comparison to reduce timing differences
-    const storedPassword = user ? user.password : 'dummy_password_value';
-    const passwordMatches = loginData.password === storedPassword;
-    // Reject if user does not exist or password is invalid
-    if (!user || !passwordMatches) {
-      throw new BadRequestException("Email or Password is invalid");
+    if (!user) {
+      throw new UnauthorizedException("Email or Password is invalid");
+    }
+
+    const passwordMatches = await argon2.verify(user.password, loginData.password);
+
+    if (!passwordMatches) {
+      throw new UnauthorizedException("Email or Password is invalid");
     }
 
     const payload: AuthJWTPayload = {
       sub: user.id,
-      email: loginData.email,
+      email: user.email,
     };
 
-    const token = this.jwtService.sign(payload);
+    const token = await this.jwtService.signAsync(payload);
 
-    return { email: user.email, token };
+    return { email: user.email, accessToken: token };
+  }
+
+  async register(userData: RegisterUserDto): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: [
+        {email: userData.email},
+        {phone: userData.phone}
+      ],
+      select: ['id', 'email', 'password']
+    });
+    
+    if (user) {
+      if(user.email == userData.email){
+        throw new ConflictException("User with this email already exists, you can login instead");
+      }else{
+        throw new ConflictException("User with this phone already exists, you can login instead");
+      }
+    }
+    
+    const hashedPassword = await argon2.hash(userData.password);
+    userData.password = hashedPassword;
+    
+    const newUser = this.userRepository.create(userData);
+
+    return await this.userRepository.save(newUser);
   }
 }

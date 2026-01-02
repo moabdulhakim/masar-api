@@ -40,6 +40,7 @@ export class RidesService {
     try {
       const ride = await queryRunner.manager.findOne(Ride, {
         where: { id: rideId },
+        select: ['id', 'status', 'version', 'driver']
       });
 
       if (!ride) {
@@ -54,6 +55,7 @@ export class RidesService {
 
       const driver = await queryRunner.manager.findOne(Driver, {
         where: { id: driverId },
+        select: ['id', 'isAvailable']
       });
 
       if (!driver) {
@@ -78,7 +80,7 @@ export class RidesService {
         throw new OptimisticLockVersionMismatchError('Ride', ride.version, ride.version + 1);
       }
 
-      const updatedRide = await queryRunner.manager.findOne(Ride, { where: { id: rideId } });
+      const updatedRide = await queryRunner.manager.findOne(Ride, { where: { id: rideId }, select: ['id', 'status', 'version', 'driver'] });
 
       await queryRunner.commitTransaction();
       return updatedRide;
