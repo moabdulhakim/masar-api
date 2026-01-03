@@ -11,8 +11,10 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  login(@Body() loginData: LoginDto) {
-    return this.authService.login(loginData);
+  async login(@Body() loginData: LoginDto) {
+    const payload = await this.authService.login(loginData);
+    await this.authService.updateRefreshToken(payload.id, payload.refreshToken);
+    return payload;
   }
 
   @Post("register")

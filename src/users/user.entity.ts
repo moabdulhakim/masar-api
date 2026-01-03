@@ -41,6 +41,9 @@ export class User {
   })
   roles: UserRole[];
 
+  @Column({ nullable: true })
+  hashedRefreshToken: string;
+
   @OneToOne(() => Driver, (driver) => driver.user, {nullable: true})
   driverProfile: Driver;
 }
