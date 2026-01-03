@@ -12,7 +12,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 private jwtConfiguration: ConfigType<typeof jwtConfig>
     ) {
         super({
-            jwtFromRequest: ExtractJwt.fromBodyField("refresh-token"),
+            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: jwtConfiguration.secret as any,
         })
     }

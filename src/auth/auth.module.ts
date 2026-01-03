@@ -9,6 +9,7 @@ import { PassportModule } from '@nestjs/passport';
 import { User } from 'src/users/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import refreshJwtConfig from './config/refresh-jwt.config';
+import { RefreshJwtStrategy } from './strategies/refresh-jwt.strategy';
 
 @Module({
   imports: [
@@ -18,8 +19,8 @@ import refreshJwtConfig from './config/refresh-jwt.config';
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(refreshJwtConfig),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, RefreshJwtStrategy],
   controllers: [AuthController],
-  exports: [JwtStrategy, PassportModule],
+  exports: [JwtStrategy, RefreshJwtStrategy, PassportModule],
 })
 export class AuthModule {}

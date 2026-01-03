@@ -12,7 +12,7 @@ export enum UserRole {
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({length: 50})
@@ -42,7 +42,7 @@ export class User {
   roles: UserRole[];
 
   @Column({ nullable: true })
-  hashedRefreshToken: string;
+  hashedRefreshToken: string | null;
 
   @OneToOne(() => Driver, (driver) => driver.user, {nullable: true})
   driverProfile: Driver;
