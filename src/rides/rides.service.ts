@@ -4,14 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateRideDto } from './dto/create-ride.dto';
-import { Ride } from './rides.entity';
+import { Ride } from '../entities/rides.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   DataSource,
   OptimisticLockVersionMismatchError,
   Repository,
 } from 'typeorm';
-import { Driver } from 'src/drivers/driver.entity';
+import { Driver } from 'src/entities/driver.entity';
 import { RideStatus } from './dto/ride-status.enum';
 
 @Injectable()
@@ -40,7 +40,7 @@ export class RidesService {
     try {
       const ride = await queryRunner.manager.findOne(Ride, {
         where: { id: rideId },
-        select: ['id', 'status', 'version', 'driver']
+        select: ['id', 'status', 'version', 'driver'],
       });
 
       if (!ride) {
@@ -55,7 +55,7 @@ export class RidesService {
 
       const driver = await queryRunner.manager.findOne(Driver, {
         where: { id: driverId },
-        select: ['id', 'isAvailable']
+        select: ['id', 'isAvailable'],
       });
 
       if (!driver) {
@@ -69,18 +69,25 @@ export class RidesService {
       }
 
       const resultOfUpdateRide = await queryRunner.manager
-      .createQueryBuilder()
-      .update(Ride)
-      .set({status: RideStatus.PENDING, driver: driver})
-      .where("id = :id", { id: rideId })
-      .andWhere("version = :currentVersion", { currentVersion: ride.version })
-      .execute();
+        .createQueryBuilder()
+        .update(Ride)
+        .set({ status: RideStatus.PENDING, driver: driver })
+        .where('id = :id', { id: rideId })
+        .andWhere('version = :currentVersion', { currentVersion: ride.version })
+        .execute();
 
       if (resultOfUpdateRide.affected === 0) {
-        throw new OptimisticLockVersionMismatchError('Ride', ride.version, ride.version + 1);
+        throw new OptimisticLockVersionMismatchError(
+          'Ride',
+          ride.version,
+          ride.version + 1,
+        );
       }
 
-      const updatedRide = await queryRunner.manager.findOne(Ride, { where: { id: rideId }, select: ['id', 'status', 'version', 'driver'] });
+      const updatedRide = await queryRunner.manager.findOne(Ride, {
+        where: { id: rideId },
+        select: ['id', 'status', 'version', 'driver'],
+      });
 
       await queryRunner.commitTransaction();
       return updatedRide;

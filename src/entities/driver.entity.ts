@@ -6,9 +6,9 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { VehicleType } from './dto/vehicle-type.enum';
-import { Ride } from 'src/rides/rides.entity';
-import { User } from 'src/users/user.entity';
+import { VehicleType } from '../drivers/dto/vehicle-type.enum';
+import { Ride } from 'src/entities/rides.entity';
+import { User } from 'src/entities/user.entity';
 
 @Entity()
 export class Driver {
@@ -21,7 +21,7 @@ export class Driver {
   @Column({ enum: VehicleType, type: 'enum', default: VehicleType.CAR })
   vehicleType: VehicleType;
 
-  @Column({length: 100})
+  @Column({ length: 100 })
   driverLicenseId: string;
 
   @Column({ type: 'jsonb', nullable: true })
@@ -33,7 +33,7 @@ export class Driver {
   @OneToMany(() => Ride, (ride) => ride.driver)
   rides: Ride[];
 
-  @OneToOne(() => User, (user) => user.driverProfile, {onDelete: 'CASCADE'})
+  @OneToOne(() => User, (user) => user.driverProfile, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 }
