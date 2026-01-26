@@ -1,7 +1,7 @@
-import { Driver } from 'src/drivers/driver.entity';
-import { Column, Entity, OneToOne } from 'typeorm';
+import { Driver } from 'src/entities/driver.entity';
+import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { PrimaryGeneratedColumn } from 'typeorm';
-
+import { UserSession } from './user-session.entity';
 
 export enum UserRole {
   DRIVER = 'driver',
@@ -9,13 +9,12 @@ export enum UserRole {
   ADMIN = 'admin',
 }
 
-
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({length: 50})
+  @Column({ length: 50 })
   name: string;
 
   @Column({ unique: true, length: 15 })
@@ -24,7 +23,7 @@ export class User {
   @Column({ unique: true, length: 100 })
   email: string;
 
-  @Column({length: 100})
+  @Column({ length: 100 })
   password: string;
 
   @Column({ type: 'jsonb', nullable: true })
@@ -37,13 +36,13 @@ export class User {
     type: 'enum',
     enum: UserRole,
     array: true,
-    default: [UserRole.RIDER]
+    default: [UserRole.RIDER],
   })
   roles: UserRole[];
 
-  @Column({ nullable: true })
-  hashedRefreshToken: string | null;
+  @OneToMany(() => UserSession, (session) => session.user)
+  sessions: UserSession[];
 
-  @OneToOne(() => Driver, (driver) => driver.user, {nullable: true})
+  @OneToOne(() => Driver, (driver) => driver.user, { nullable: true })
   driverProfile: Driver;
 }

@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RidesModule } from './rides/rides.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { SessionsModule } from './sessions/sessions.module';
 import dbConfigDevelopment from './config/db.config.development';
 import dbConfigProduction from './config/db.config.production';
 
@@ -22,6 +23,7 @@ import dbConfigProduction from './config/db.config.production';
     RidesModule,
     AuthModule,
     UsersModule,
+    SessionsModule,
   ],
 })
 export class AppModule {}
