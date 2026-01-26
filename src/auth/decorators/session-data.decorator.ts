@@ -10,7 +10,14 @@ export const SessionData = createParamDecorator(
         const request = ctx.switchToHttp().getRequest();
 
         const userAgent = request.headers["user-agent"];
-        const ip = request.headers["x-forwarded-for"] || request.ip;
+
+
+        let ip: string = request.ip;
+
+        let xForwardedFor = request.headers["x-forwarded-for"];
+        if(!ip && typeof xForwardedFor == "string"){
+            ip = xForwardedFor.split(",")[0];
+        }
 
         return { userAgent, ip };
     }

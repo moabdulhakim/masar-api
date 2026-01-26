@@ -9,8 +9,8 @@ import {
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { AuthJWTPayload } from 'src/auth/types/auth-jwtPayload';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { User } from 'src/entities/user.entity';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
 import * as argon2 from 'argon2';
@@ -19,6 +19,7 @@ import { ConfigType } from '@nestjs/config';
 import { UserSession } from 'src/entities/user-session.entity';
 import { AuthRefreshJWTPayload } from './types/auth-refresh-jwt-payload';
 import { SessionDataType } from './decorators/session-data.decorator';
+
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -35,12 +36,9 @@ export class AuthService {
 
     @Inject(refreshJwtConfig.KEY)
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
-
-    @InjectDataSource()
-    private dataSource: DataSource,
   ) {}
 
-  async generateTokens(userId, sid) {
+  async generateTokens(userId: string, sid: string) {
     const payload: AuthJWTPayload = {
       sub: userId,
     };
@@ -119,6 +117,16 @@ export class AuthService {
     };
   }
 
+  async updateSessionLocation(sessionId: string, ip: string){
+    try{
+      const location = await this.getIpLocation(ip);
+      await this.userSessionRepository.update({id: sessionId}, {location});
+      console.log(`Location Updated for Session ${sessionId}`)
+    }catch(err){
+      console.log("Background location update failed", err);
+    }
+  }
+
   async login(loginData: LoginDto, sessionData: SessionDataType) {
     const user = await this.userRepository.findOne({
       where: { email: loginData.email },
@@ -146,16 +154,15 @@ export class AuthService {
     );
     const refreshTokenHash = await argon2.hash(refreshToken);
 
-    const location = await this.getIpLocation(sessionData.ip);
-
     await this.userSessionRepository.save({
       id: sid,
       user: user,
-      location: location,
       userAgent: sessionData.userAgent,
       ipAddress: sessionData.ip,
       refreshTokenHash,
     });
+
+    this.updateSessionLocation(sid, sessionData.ip);
 
     return { id: user.id, accessToken, refreshToken };
   }
@@ -201,14 +208,21 @@ export class AuthService {
 
   async getIpLocation(ip: string) {
     if (ip === '127.0.0.1' || ip === '::1') return 'Local Development';
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(()=> controller.abort(), 2000);
     
     try {
-        const response = await fetch(`http://ip-api.com/json/${ip}`);
+        const response = await fetch(`http://ip-api.com/json/${ip}`, {signal: controller.signal});
+        clearTimeout(timeoutId);
         const {country, regionName, city} = await response.json();
         return `${country}, ${regionName}, ${city}`;
     } catch (error) {
+        if(error.name === 'AbortError'){
+          console.log("ip-api.com request timed out");
+        }
         return 'Unknown Location';
     }
-}
+  }
 }
 

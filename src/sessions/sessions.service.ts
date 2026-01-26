@@ -14,7 +14,8 @@ export class SessionsService {
         return await this.sessionsRepository.find({
             where:{
                 user: {id: userId}
-            }
+            },
+            select: ["createdAt", "location", "userAgent"]
         })
     }
 }
