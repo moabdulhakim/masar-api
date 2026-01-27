@@ -9,15 +9,11 @@ export const SessionData = createParamDecorator(
     (data: string, ctx: ExecutionContext) => {
         const request = ctx.switchToHttp().getRequest();
 
-        const userAgent = request.headers["user-agent"];
+        let userAgent = request.headers["user-agent"] || "unknown";
 
-
-        let ip: string = request.ip;
 
         let xForwardedFor = request.headers["x-forwarded-for"];
-        if(!ip && typeof xForwardedFor == "string"){
-            ip = xForwardedFor.split(",")[0];
-        }
+        let ip: string = request.ip || (typeof xForwardedFor === 'string'? xForwardedFor.split(',')[0] : "unknown");
 
         return { userAgent, ip };
     }
