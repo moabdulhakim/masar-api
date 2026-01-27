@@ -8,17 +8,17 @@ export class UserSession {
     @PrimaryGeneratedColumn("uuid")
     id: string;
     
-    @Column({ nullable: true, length: 255 })
+    @Column({ nullable: false, length: 255 })
     refreshTokenHash: string;
     
-    @Column()
+    @Column({length: 255})
     userAgent: string;
 
-    @Column({nullable: true})
+    @Column({length: 45})
     ipAddress: string;
 
-    @Column({nullable: true})
-    location: string;
+    @Column({length: 255, nullable: true})
+    location: string | null;
 
     @CreateDateColumn()
     createdAt: Date;
