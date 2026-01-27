@@ -11,7 +11,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthJWTPayload } from 'src/auth/types/auth-jwtPayload';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/entities/user.entity';
+import { User, UserRole } from 'src/entities/user.entity';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
 import * as argon2 from 'argon2';
 import refreshJwtConfig from './config/refresh-jwt.config';
@@ -38,13 +38,15 @@ export class AuthService {
     private refreshTokenConfig: ConfigType<typeof refreshJwtConfig>,
   ) {}
 
-  async generateTokens(userId: string, sid: string) {
+  async generateTokens(userId: string, roles: UserRole[], sid: string) {
     const payload: AuthJWTPayload = {
       sub: userId,
+      roles,
     };
 
     const refreshTokenPayload: AuthRefreshJWTPayload = {
       sub: userId,
+      roles,
       sid: sid,
     };
 
@@ -83,8 +85,12 @@ export class AuthService {
       where: { id: sid, user: { id: userId } },
       select: ['refreshTokenHash', 'id', 'userAgent'],
     });
+    const user = await this.userRepository.findOne({
+      where: {id: userId},
+      select: ["roles"]
+    })
 
-    if (!userSession || !userSession.refreshTokenHash) {
+    if (!userSession || !userSession.refreshTokenHash || !user) {
       throw new UnauthorizedException('Security Alert!'); //TODO Send an Alert to the Admin!!
     }
 
@@ -106,7 +112,7 @@ export class AuthService {
     }
 
     const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
-      await this.generateTokens(userId, sid);
+      await this.generateTokens(userId, user.roles, sid);
 
     await this.updateRefreshToken(sid, newRefreshToken);
 
@@ -130,7 +136,7 @@ export class AuthService {
   async login(loginData: LoginDto, sessionData: SessionDataType) {
     const user = await this.userRepository.findOne({
       where: { email: loginData.email },
-      select: ['id', 'email', 'password'],
+      select: ['id', 'email', 'password', 'roles'],
     });
 
     if (!user) {
@@ -150,6 +156,7 @@ export class AuthService {
 
     const { accessToken, refreshToken } = await this.generateTokens(
       user.id,
+      user.roles,
       sid,
     );
     const refreshTokenHash = await argon2.hash(refreshToken);

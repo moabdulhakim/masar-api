@@ -9,16 +9,16 @@ export class UserSession {
     id: string;
     
     @Column({ nullable: true, length: 255 })
-    refreshTokenHash: string | null;
+    refreshTokenHash: string;
     
     @Column()
     userAgent: string;
 
     @Column({nullable: true})
-    ipAddress: string | null;
+    ipAddress: string;
 
     @Column({nullable: true})
-    location: string | null;
+    location: string;
 
     @CreateDateColumn()
     createdAt: Date;

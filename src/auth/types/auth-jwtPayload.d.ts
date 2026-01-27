@@ -1,4 +1,4 @@
-export type AuthJWTPayload = {
+export interface AuthJWTPayload {
     sub: string,
-    email?: string,
+    roles: UserRole[],
 } 
