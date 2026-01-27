@@ -11,12 +11,10 @@ export class UsersService {
     ){}
 
     async deleteAllUsers(){
-        try{
-            return await this.userRepo.delete({
-                roles: Not(ArrayContains([UserRole.ADMIN]))
-            });
-        }catch(err){
-            throw err;
-        }
+        return await this.userRepo.delete({
+            roles: Not(ArrayContains([UserRole.ADMIN]))
+        });
     }
+}
+
 }
