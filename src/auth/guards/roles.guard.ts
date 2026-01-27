@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { UserRole } from "src/entities/user.entity";
 import { AuthJWTPayload } from "../types/auth-jwtPayload";
@@ -18,10 +18,10 @@ export class RolesGuard implements CanActivate {
             throw new UnauthorizedException();
         }
 
-        const requiredRoles = this.reflector.get<UserRole[]>(ROLES_KEY, context.getHandler());
+        const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(ROLES_KEY, [context.getHandler(), context.getClass()]);
 
-        if(user.roles.some((role)=> requiredRoles.includes(role))) return true;
+        if(!requiredRoles || user.roles.some((role)=> requiredRoles.includes(role))) return true;
 
-        throw new UnauthorizedException();
+        throw new ForbiddenException();
     }
 }
