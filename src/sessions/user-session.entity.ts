@@ -21,7 +21,7 @@ export class UserSession {
   @Column({ length: 45 })
   ipAddress: string;
 
-  @Column({ length: 255, nullable: true })
+  @Column({ length: 255})
   location: string;
 
   @CreateDateColumn()

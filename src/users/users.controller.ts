@@ -4,6 +4,7 @@ import { UserRole } from 'src/users/user.entity';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
+import { ApiResponseUtil } from 'src/common/utils/api-response.util';
 
 @Controller({
   path: 'users',
@@ -16,6 +17,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Delete()
   async deleteAllUsers() {
-    return this.usersService.deleteAllUsers();
+    const result = await this.usersService.deleteAllUsers();
+    return ApiResponseUtil.success("All users deleted successfully", result);
   }
 }

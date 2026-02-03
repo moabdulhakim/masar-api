@@ -1,13 +1,11 @@
 import {
   Body,
   Controller,
-  Get,
-  NotFoundException,
-  Param,
   Post,
 } from '@nestjs/common';
 import { DriversService } from './drivers.service';
 import { CreateDriverDto } from './dto/create-driver.dto';
+import { ApiResponseUtil } from 'src/common/utils/api-response.util';
 
 @Controller({
   path: 'drivers',
@@ -17,7 +15,8 @@ export class DriversController {
   constructor(private readonly driversService: DriversService) {}
 
   @Post()
-  create(@Body() createDriverDto: CreateDriverDto) {
-    return this.driversService.create(createDriverDto);
+  async create(@Body() createDriverDto: CreateDriverDto) {
+    const driver = await this.driversService.create(createDriverDto);
+    return ApiResponseUtil.success("Driver Profile created successfully", driver);
   }
 }
