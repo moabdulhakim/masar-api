@@ -6,11 +6,11 @@ import jwtConfig from 'src/auth/config/jwt.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { User } from 'src/entities/user.entity';
+import { User } from 'src/users/user.entity';
 import { ConfigModule } from '@nestjs/config';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { RefreshJwtStrategy } from './strategies/refresh-jwt.strategy';
-import { UserSession } from 'src/entities/user-session.entity';
+import { UserSession } from 'src/sessions/user-session.entity';
 
 @Module({
   imports: [

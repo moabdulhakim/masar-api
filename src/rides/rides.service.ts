@@ -4,14 +4,14 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateRideDto } from './dto/create-ride.dto';
-import { Ride } from '../entities/rides.entity';
+import { Ride } from './rides.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   DataSource,
   OptimisticLockVersionMismatchError,
   Repository,
 } from 'typeorm';
-import { Driver } from 'src/entities/driver.entity';
+import { Driver } from 'src/drivers/driver.entity';
 import { RideStatus } from './dto/ride-status.enum';
 
 @Injectable()

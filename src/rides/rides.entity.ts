@@ -6,7 +6,7 @@ import {
   VersionColumn,
 } from 'typeorm';
 import { RideStatus } from 'src/rides/dto/ride-status.enum';
-import { Driver } from 'src/entities/driver.entity';
+import { Driver } from '../drivers/driver.entity';
 
 @Entity()
 export class Ride {
