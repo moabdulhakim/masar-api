@@ -3,6 +3,7 @@ import { SessionsService } from './sessions.service';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { AuthJWTPayload } from 'src/auth/types/auth-jwtPayload';
+import { ApiResponseUtil } from 'src/common/utils/api-response.util';
 
 @Controller({
     path: "sessions",
@@ -14,6 +15,7 @@ export class SessionsController {
     @UseGuards(JwtAuthGuard)
     @Get("user")
     async getUserSessions(@CurrentUser() user: AuthJWTPayload) {
-        return this.sessionsService.getUserSessions(user.sub);
+        const sessions = await this.sessionsService.getUserSessions(user.sub);
+        return ApiResponseUtil.success("User sessions fetched successfully", sessions);
     }
 }

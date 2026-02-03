@@ -165,6 +165,7 @@ export class AuthService {
       user: user,
       userAgent: sessionData.userAgent,
       ipAddress: sessionData.ip,
+      location: "Not specified yet",
       refreshTokenHash,
     });
 

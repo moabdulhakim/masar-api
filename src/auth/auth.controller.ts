@@ -7,6 +7,7 @@ import { CurrentUser } from './decorators/current-user.decorator';
 import { SessionData, SessionDataType } from './decorators/session-data.decorator';
 import { Response } from 'express';
 import { getCookieOptions } from './utils/cookie-options.util';
+import { ApiResponseUtil } from 'src/common/utils/api-response.util';
 
 @Controller({
   path: 'auth',
@@ -22,7 +23,7 @@ export class AuthController {
     response.cookie('accessToken', accessToken, getCookieOptions('access'));
     response.cookie('refreshToken', refreshToken, getCookieOptions('refresh'));
 
-    return user;
+    return ApiResponseUtil.success("Logged in successfully", user);
   }
 
   @Post('register')
@@ -32,7 +33,7 @@ export class AuthController {
     response.cookie('accessToken', accessToken, getCookieOptions('access'));
     response.cookie('refreshToken', refreshToken, getCookieOptions('refresh'));
 
-    return user;
+    return ApiResponseUtil.success("Registered successfully", user);
   }
 
   @UseGuards(RefreshJwtAuthGuard)
@@ -43,7 +44,7 @@ export class AuthController {
     
     await this.authService.logout(user.sid);
 
-    return { message: 'Logged out successfully from this device' };
+    return ApiResponseUtil.success('Logged out successfully from this device');
   }
 
   @UseGuards(RefreshJwtAuthGuard)
@@ -54,6 +55,6 @@ export class AuthController {
     response.cookie('accessToken', accessToken, getCookieOptions('access'));
     response.cookie('refreshToken', refreshToken, getCookieOptions('refresh'));
 
-    return {message: "Tokens have been refreshed successfully!"};
+    return ApiResponseUtil.success("Tokens have been refreshed successfully!");
   }
 }
