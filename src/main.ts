@@ -8,7 +8,8 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.set('trust proxy', true);
+  const trustProxy = process.env.TRUST_PROXY ?? 'loopback';
+  app.set('trust proxy', trustProxy);
   app.setGlobalPrefix('api');
 
   app.enableVersioning({
