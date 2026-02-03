@@ -12,13 +12,17 @@ async function bootstrap() {
   const trustProxy = process.env.TRUST_PROXY ?? 'loopback';
   app.set('trust proxy', trustProxy);
 
+  const defaultCorsOrigins = ['http://localhost:3001', 'http://localhost:3000'];
+  const configuredCorsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim()).filter(Boolean)
+    : undefined;
+  const corsOrigins =
+    configuredCorsOrigins ?? (process.env.NODE_ENV === 'development' ? defaultCorsOrigins : []);
+
   app.enableCors({
-    origin: [
-      "http://localhost:3001",
-      "http://localhost:3000"
-    ],
+    origin: corsOrigins,
     credentials: true,
-  })
+  });
 
   app.setGlobalPrefix('api');
 
