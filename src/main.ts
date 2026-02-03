@@ -3,11 +3,13 @@ import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { PostgresErrorFilter } from './common/filters/postgres-error.filter';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  app.set('trust proxy', 'loopback');
+  const trustProxy = process.env.TRUST_PROXY ?? 'loopback';
+  app.set('trust proxy', trustProxy);
   app.setGlobalPrefix('api');
 
   app.enableVersioning({
@@ -22,6 +24,8 @@ async function bootstrap() {
   );
 
   app.useGlobalFilters(new PostgresErrorFilter());
+
+  app.use(cookieParser());
 
   await app.listen(3000);
 }

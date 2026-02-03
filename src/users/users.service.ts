@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User, UserRole } from 'src/entities/user.entity';
+import { User, UserRole } from 'src/users/user.entity';
 import { ArrayContains, Not, Repository } from 'typeorm';
 
 @Injectable()
@@ -15,6 +15,4 @@ export class UsersService {
             roles: Not(ArrayContains([UserRole.ADMIN]))
         });
     }
-}
-
 }

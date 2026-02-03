@@ -1,7 +1,7 @@
-import { Driver } from 'src/entities/driver.entity';
+import { Driver } from '../drivers/driver.entity';
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { PrimaryGeneratedColumn } from 'typeorm';
-import { UserSession } from './user-session.entity';
+import { UserSession } from '../sessions/user-session.entity';
 
 export enum UserRole {
   DRIVER = 'driver',

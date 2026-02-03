@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { VehicleType } from '../drivers/dto/vehicle-type.enum';
-import { Ride } from 'src/entities/rides.entity';
-import { User } from 'src/entities/user.entity';
+import { Ride } from 'src/rides/rides.entity';
+import { User } from 'src/users/user.entity';
 
 @Entity()
 export class Driver {

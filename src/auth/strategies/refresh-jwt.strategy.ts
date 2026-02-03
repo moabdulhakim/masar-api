@@ -14,15 +14,24 @@ export class RefreshJwtStrategy extends PassportStrategy(Strategy, "refresh-jwt"
         private refreshJwtConfiguration: ConfigType<typeof refreshJwtConfig>,
     ) {
         super({
-            jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                RefreshJwtStrategy.extractJwtFromCookie,
+                ExtractJwt.fromAuthHeaderAsBearerToken(),
+            ]),
             secretOrKey: refreshJwtConfiguration.secret as any,
             passReqToCallback: true,
         })
     }
 
+    private static extractJwtFromCookie(req: Request): string | null {
+        if(req.cookies && 'refreshToken' in req.cookies && req.cookies.refreshToken.length > 0){
+            return req.cookies.refreshToken;
+        }
+        return null;
+    }
 
     validate(req: Request, payload: AuthRefreshJWTPayload) {
-        const refreshToken = req.get('Authorization')?.replace("Bearer", '').trim();
+        const refreshToken = RefreshJwtStrategy.extractJwtFromCookie(req) || req.get('Authorization')?.replace("Bearer ", '').trim();
 
         return {...payload, id: payload.sub, refreshToken};
     }

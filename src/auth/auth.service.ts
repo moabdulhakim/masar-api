@@ -11,15 +11,14 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthJWTPayload } from 'src/auth/types/auth-jwtPayload';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User, UserRole } from 'src/entities/user.entity';
+import { User, UserRole } from 'src/users/user.entity';
 import { RegisterUserDto } from 'src/auth/dto/register-user.dto';
 import * as argon2 from 'argon2';
 import refreshJwtConfig from './config/refresh-jwt.config';
 import { ConfigType } from '@nestjs/config';
-import { UserSession } from 'src/entities/user-session.entity';
+import { UserSession } from 'src/sessions/user-session.entity';
 import { AuthRefreshJWTPayload } from './types/auth-refresh-jwt-payload';
 import { SessionDataType } from './decorators/session-data.decorator';
-
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -86,9 +85,9 @@ export class AuthService {
       select: ['refreshTokenHash', 'id', 'userAgent'],
     });
     const user = await this.userRepository.findOne({
-      where: {id: userId},
-      select: ["roles"]
-    })
+      where: { id: userId },
+      select: ['roles'],
+    });
 
     if (!userSession || !userSession.refreshTokenHash || !user) {
       throw new UnauthorizedException('Security Alert!'); //TODO Send an Alert to the Admin!!
@@ -123,13 +122,13 @@ export class AuthService {
     };
   }
 
-  async updateSessionLocation(sessionId: string, ip: string){
-    try{
+  async updateSessionLocation(sessionId: string, ip: string) {
+    try {
       const location = await this.getIpLocation(ip);
-      await this.userSessionRepository.update({id: sessionId}, {location});
-      console.log(`Location Updated for Session ${sessionId}`)
-    }catch(err){
-      console.log("Background location update failed", err);
+      await this.userSessionRepository.update({ id: sessionId }, { location });
+      console.log(`Location Updated for Session ${sessionId}`);
+    } catch (err) {
+      console.log('Background location update failed', err);
     }
   }
 
@@ -171,7 +170,7 @@ export class AuthService {
 
     this.updateSessionLocation(sid, sessionData.ip);
 
-    return { id: user.id, accessToken, refreshToken };
+    return { user: {...user, password: null}, accessToken, refreshToken };
   }
 
   async register(userData: RegisterUserDto, sessionData: SessionDataType) {
@@ -196,40 +195,45 @@ export class AuthService {
 
     const hashedPassword = await argon2.hash(userData.password);
 
-    const newUser = this.userRepository.create({...userData, password: hashedPassword});
+    const newUser = this.userRepository.create({
+      ...userData,
+      password: hashedPassword,
+    });
 
     const savedUser = await this.userRepository.save(newUser);
 
-    return await this.login({email: savedUser.email, password: userData.password}, sessionData);
+    return await this.login(
+      { email: savedUser.email, password: userData.password },
+      sessionData,
+    );
   }
 
-  async logout(sid: string){
-    const result = await this.userSessionRepository.delete({id: sid});
+  async logout(sid: string) {
+    const result = await this.userSessionRepository.delete({ id: sid });
 
-    if(result.affected === 0) {
-      throw new NotFoundException("Session does not exist");
+    if (result.affected === 0) {
+      throw new NotFoundException('Session does not exist');
     }
-
-    return {message: "Logged out successfully from this device"};
   }
 
   async getIpLocation(ip: string) {
     if (ip === '127.0.0.1' || ip === '::1') return 'Local Development';
 
     const controller = new AbortController();
-    const timeoutId = setTimeout(()=> controller.abort(), 2000);
-    
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     try {
-        const response = await fetch(`http://ip-api.com/json/${ip}`, {signal: controller.signal});
-        clearTimeout(timeoutId);
-        const {country, regionName, city} = await response.json();
-        return `${country}, ${regionName}, ${city}`;
+      const response = await fetch(`http://ip-api.com/json/${ip}`, {
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      const { country, regionName, city } = await response.json();
+      return `${country}, ${regionName}, ${city}`;
     } catch (error) {
-        if(error.name === 'AbortError'){
-          console.log("ip-api.com request timed out");
-        }
-        return 'Unknown Location';
+      if (error.name === 'AbortError') {
+        console.log('ip-api.com request timed out');
+      }
+      return 'Unknown Location';
     }
   }
 }
-
