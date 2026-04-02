@@ -19,7 +19,7 @@ The architecture follows the "Hard Way" learning path, focusing on manual implem
 
 ### 1. Clone the repository
 ```bash
-git clone [https://github.com/mohammadabdulhakim/masar-api.git](https://github.com/mohammadabdulhakim/masar-api.git)
+git clone https://github.com/moabdulhakim/masar-api.git
 cd masar-api
 ```
 
@@ -131,3 +131,18 @@ The API will be accessible at `http://localhost:3000/api/v1`.
 * [x] **IP Address Tracking:** Track session IP addresses
 * [x] **Session Listing:** Users can view their active sessions
 * [x] **Refresh Token Management:** Secure refresh token storage per session
+
+---
+
+## 🚀 What's Next? (Building V2)
+
+This repository serves as my solid learning ground for core backend concepts (Dependency Injection, JWT, TypeORM, and Transactions). 
+
+Currently, I am teaming up with two friends to scale this architecture into a functional MVP (Version 2.0). Our active development goals include:
+
+* **Real-Time Tracking:** Replacing basic location updates with **WebSockets** for live driver tracking.
+* **Geospatial Queries:** Migrating location data to **PostGIS** to efficiently query "nearest drivers" without overloading the database.
+* **Safe Financials:** Building a basic Wallet/Ledger system, continuing to rely on database transactions and locking to safely handle mock payments.
+* **AI Integration:** Collaborating to integrate a basic ride-matching algorithm to connect riders and drivers smartly.
+
+*We are building this iteratively, focusing on clean code and practical problem-solving rather than over-engineering.*
