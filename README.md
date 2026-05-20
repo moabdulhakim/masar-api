@@ -138,6 +138,8 @@ The API will be accessible at `http://localhost:3000/api/v1`.
 
 This repository serves as my solid learning ground for core backend concepts (Dependency Injection, JWT, TypeORM, and Transactions). 
 
+Note: the data model in V1 was intentionally kept simple as a learning ground. V2 restructures the schema with PostGIS, a proper ledger system, and a cleaner domain model.
+
 Currently, I am teaming up with two friends to scale this architecture into a functional MVP (Version 2.0). Our active development goals include:
 
 * **Real-Time Tracking:** Replacing basic location updates with **WebSockets** for live driver tracking.
