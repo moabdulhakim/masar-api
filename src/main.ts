@@ -1,14 +1,26 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { PostgresErrorFilter } from './common/filters/postgres-error.filter';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import { PostgresErrorFilter } from './common/filters/postgres-error.filter';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { AppModule } from './app.module';
 import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  const config = new DocumentBuilder()
+    .setTitle('Masar Fleet Management API')
+    .setDescription(
+      'Core backend services for the Masar fleet management platform. Features include secure JWT-based authentication, role management, and concurrency-safe ride assignments using Optimistic Locking.',
+    )
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, documentFactory);
 
   const trustProxy = process.env.TRUST_PROXY ?? 'loopback';
   app.set('trust proxy', trustProxy);
