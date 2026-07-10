@@ -1,0 +1,254 @@
+{
+  "info": {
+    "name": "Masar API",
+    "description": "Complete API documentation for the Masar ride-hailing backend.\n\nBase URL: `{{baseUrl}}` (default: `http://localhost:3000/api/v1`)\n\nAll endpoints are versioned under `/api/v1/`.\n\nAuthentication uses JWT tokens stored in cookies (`accessToken` and `refreshToken`), which are set automatically on login/register responses.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "rideId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints for user login, registration, logout, and token refresh.\n\nTokens are returned as HTTP-only cookies.",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"phone\": \"+201234567890\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securePassword123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Register a new user account.\n\nSets `accessToken` and `refreshToken` cookies on success.\n\n**Validation:**\n- `name`: string, required, max 100 chars\n- `phone`: string, required, max 15 chars\n- `email`: valid email, required, max 100 chars\n- `password`: string, required, min 8 / max 100 chars"
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securePassword123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Authenticate an existing user.\n\nSets `accessToken` and `refreshToken` cookies on success.\n\n**Validation:**\n- `email`: valid email, required, max 100 chars\n- `password`: string, required, max 100 chars"
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            },
+            "description": "Log out the current session.\n\nRequires a valid `refreshToken` cookie.\n\nClears both `accessToken` and `refreshToken` cookies.\n\n**Auth:** Refresh JWT (cookie)"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Tokens",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-tokens",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh-tokens"]
+            },
+            "description": "Refresh the access and refresh tokens.\n\nRequires a valid `refreshToken` cookie. Issues new tokens and updates the cookies.\n\n**Auth:** Refresh JWT (cookie)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "User management endpoints.\n\n**Auth:** Requires JWT access token (cookie).\n**Roles:** Admin only.",
+      "item": [
+        {
+          "name": "Delete All Users",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Delete all users from the system.\n\n**Auth:** JWT (cookie)\n**Role:** `ADMIN` only"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sessions",
+      "description": "Session management endpoints.\n\n**Auth:** Requires JWT access token (cookie).",
+      "item": [
+        {
+          "name": "Get User Sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/user",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "user"]
+            },
+            "description": "Retrieve all active sessions for the currently authenticated user.\n\n**Auth:** JWT (cookie)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Rides",
+      "description": "Ride management endpoints for creating, listing, and accepting rides.",
+      "item": [
+        {
+          "name": "Get All Rides",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rides",
+              "host": ["{{baseUrl}}"],
+              "path": ["rides"]
+            },
+            "description": "Fetch all rides.\n\n**Auth:** None required"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Ride",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/rides",
+              "host": ["{{baseUrl}}"],
+              "path": ["rides"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startLocation\": {\n    \"lat\": 30.0444,\n    \"lng\": 31.2357\n  },\n  \"endLocation\": {\n    \"lat\": 30.0131,\n    \"lng\": 31.2089\n  },\n  \"cost\": 50.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Create a new ride request.\n\n**Auth:** None required\n\n**Validation:**\n- `startLocation`: object with `lat` (number) and `lng` (number), required\n- `endLocation`: object with `lat` (number) and `lng` (number), required\n- `cost`: number, required"
+          },
+          "response": []
+        },
+        {
+          "name": "Accept Ride",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/rides/:rideId/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["rides", ":rideId", "accept"],
+              "variable": [
+                {
+                  "key": "rideId",
+                  "value": "{{rideId}}",
+                  "description": "UUID of the ride to accept"
+                }
+              ]
+            },
+            "description": "Accept a pending ride as a driver.\n\nThe driver is identified from the authenticated user's JWT.\n\n**Auth:** JWT (cookie)\n\n**Path params:**\n- `rideId`: UUID of the ride"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Drivers",
+      "description": "Driver profile management endpoints.",
+      "item": [
+        {
+          "name": "Create Driver",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/drivers",
+              "host": ["{{baseUrl}}"],
+              "path": ["drivers"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ahmed Ali\",\n  \"vehicleType\": \"car\",\n  \"phone\": \"+201098765432\",\n  \"email\": \"ahmed@example.com\",\n  \"password\": \"securePassword123\",\n  \"driverLicenseId\": \"DL-12345678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Register a new driver profile.\n\n**Auth:** None required\n\n**Validation:**\n- `name`: string, required, max 100 chars\n- `vehicleType`: enum (`van`, `car`, `truck`), required\n- `phone`: string, required, max 15 chars\n- `email`: valid email, required, max 100 chars\n- `password`: string, required, min 8 / max 100 chars\n- `driverLicenseId`: string, required, max 100 chars"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
