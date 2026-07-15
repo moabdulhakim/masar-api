@@ -3,6 +3,8 @@ services:
     build:
       context: .
       target: development
+    depends_on:
+      - db
     ports:
       - "3000:3000"
     volumes:
@@ -18,3 +20,16 @@ services:
       - "8080:3000"
     env_file:
       - .env.production
+    
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql
+    environment:
+      POSTGRES_PASSWORD: example
+
+volumes:
+  db-data:

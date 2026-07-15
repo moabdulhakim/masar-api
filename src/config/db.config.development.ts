@@ -9,8 +9,6 @@ export default (): PostgresConnectionOptions => (
       migrations: [join(__dirname, '..', '..','dist', 'src', 'db', 'migrations', '*.js')],
       synchronize: true,
       logging: false, // set to true to enable query logging for debugging
-      ssl: {
-        rejectUnauthorized: false,
-      },
+      ssl: false,
     }
 )
