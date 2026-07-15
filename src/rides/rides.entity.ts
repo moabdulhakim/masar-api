@@ -1,12 +1,14 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   VersionColumn,
 } from 'typeorm';
 import { RideStatus } from 'src/rides/dto/ride-status.enum';
 import { Driver } from '../drivers/driver.entity';
+import { User } from 'src/users/user.entity';
 
 @Entity()
 export class Ride {
@@ -27,6 +29,10 @@ export class Ride {
 
   @ManyToOne(() => Driver, (driver) => driver.rides, { nullable: true })
   driver: Driver;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'riderId' })
+  rider: User;
 
   @VersionColumn()
   version: number;
